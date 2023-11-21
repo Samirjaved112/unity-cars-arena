@@ -1470,7 +1470,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 342589411}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 33.08, y: 3.922, z: 18.72}
+  m_LocalPosition: {x: 33.08, y: 3.922, z: 8.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1499,6 +1499,7 @@ MonoBehaviour:
   carRotationSmoothness: 2
   setSpeedForward: 25
   driftMoveSpeed: 8
+  jumpMoveSpeed: 10
   driftForce: 12
   skidMarks:
   - {fileID: 2046908670}
@@ -1513,10 +1514,14 @@ MonoBehaviour:
   carTyre:
   - {fileID: 519662539}
   - {fileID: 96981725}
-  raycastDistance: 2.5
+  raycastDistance: 0.55
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
+  jumpTime: 0
+  isJump: 0
+  isGrounded: 0
+  brakeSpeed: 0
 --- !u!54 &342589414
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1701,8 +1706,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 363067181}
-  m_LocalRotation: {x: -0.56733936, y: -0.0000000048809263, z: 0.000000007084587, w: 0.82348406}
-  m_LocalPosition: {x: 33.08, y: -3.2800045, z: -24.432003}
+  m_LocalRotation: {x: -0.56733936, y: 0.0000000048809308, z: -0.0000000070845925, w: 0.82348406}
+  m_LocalPosition: {x: 33.08, y: -13.300007, z: -24.432001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2731,8 +2736,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: -0.56733936, y: -0.0000000048809263, z: 0.000000007084587, w: 0.82348406}
-  m_LocalPosition: {x: 33.08, y: -3.2800045, z: -24.432003}
+  m_LocalRotation: {x: -0.56733936, y: 0.0000000048809308, z: -0.0000000070845925, w: 0.82348406}
+  m_LocalPosition: {x: 33.08, y: -13.300007, z: -24.432001}
   m_LocalScale: {x: 10, y: 10, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3387,7 +3392,7 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1160198082}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 134.65646, y: 4.8837886, z: 121.655556}
@@ -3693,7 +3698,7 @@ MonoBehaviour:
   zOffset: 0.8660254
   hexagonprefab: {fileID: 7595541677925215186, guid: 470f68564129bc94ca1b6a5a5bc32cf2, type: 3}
   spawnPoint: {fileID: 0}
-  numOfRows: 70
+  numOfRows: 100
 --- !u!4 &1240808933 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5231857904784350407, guid: 470f68564129bc94ca1b6a5a5bc32cf2, type: 3}

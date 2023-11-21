@@ -11,6 +11,7 @@ public class CarController : MonoBehaviour
     [SerializeField] private float carRotationSmoothness;
     [SerializeField] private float setSpeedForward;
     [SerializeField] private float driftMoveSpeed;
+    [SerializeField] private float jumpMoveSpeed;
     [SerializeField] private float driftForce;
     [SerializeField] private GameObject[] skidMarks;
     [SerializeField] private float driftThreshold;
@@ -27,7 +28,12 @@ public class CarController : MonoBehaviour
     private bool addForce = true;
     [SerializeField] private float raycastDistance;
     [SerializeField] private LayerMask groundLayer;
-    bool singleTap = false;
+    [SerializeField] private float jumpTime;
+     public bool isJump;
+
+    public bool isGrounded;
+    public float brakeSpeed= 0;
+
     private void Start()
     {
         touchDelta = 0;
@@ -39,7 +45,7 @@ public class CarController : MonoBehaviour
         {
             if (addForce)
             {
-                moveSpeedForward = driftMoveSpeed;
+                moveSpeedForward = driftMoveSpeed- brakeSpeed;
                 rb.AddForce(moveDirection * driftForce, ForceMode.VelocityChange);
                 addForce = false;
             }
@@ -47,25 +53,22 @@ public class CarController : MonoBehaviour
         else
         {
             addForce = true;
-            moveSpeedForward = setSpeedForward;
+            moveSpeedForward = setSpeedForward-brakeSpeed;
         }
         moveDirection = pivot.transform.forward;
         transform.Translate(moveDirection * moveSpeedForward * Time.deltaTime);
+
         if (Input.touchCount > 0)
         {
-          
+
             Touch touch = Input.GetTouch(0);
-            if (touch.phase == TouchPhase.Began && touch.tapCount == 1)
-            {
-                Debug.Log("now is true");
-                singleTap = true;
-            }
+            jumpTime += Time.deltaTime;
             if (touch.phase == TouchPhase.Began)
             {
-
                 touchStartPositon = new Vector3(touch.position.x, 0, 0);
+                jumpTime = 0;
             }
-            if (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary)
+            if (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary && jumpTime >= 0.5f)
             {
                 touchDelta = (touch.position.x - touchStartPositon.x) / Screen.width;
                 pivot.transform.Rotate(Vector3.up, touchDelta * pivotRotationSpeed * Time.deltaTime);
@@ -74,25 +77,31 @@ public class CarController : MonoBehaviour
                 car.transform.rotation = Quaternion.Slerp(car.transform.rotation, targetRotation, carRotationSmoothness * Time.deltaTime);
                 if (touchDelta > 0)
                 {
-               // RotateWheels(30f);
+                    // RotateWheels(30f);
                 }
-                else if(touchDelta<0)
+                else if (touchDelta < 0)
                 {
-                   // RotateWheels(-30f);
+                    // RotateWheels(-30f);
                 }
             }
             else if (touch.phase == TouchPhase.Ended)
             {
+                if (jumpTime < 0.5f)
+                {
+                    if (isGrounded)
+                    {
+                        brakeSpeed = jumpMoveSpeed;
+                        isJump = true;
+                        Debug.Log("jumping");
+                        rb.AddForce(Vector3.up * 20f, ForceMode.Impulse);
+                        Physics.gravity = Vector3.down * 15f; 
+                        isGrounded = false;
+                    }
+                }
                 touchDelta = 0;
                 startMoving = true;
                 smoothFactorCarBody = 0;
-                if (singleTap)
-                {
-                    // Perform jump functionality here
-                    raycastDistance = 0f;
-                    Jump();
-                     // Reset the singleTap flag
-                }
+
             }
         }
         if (startMoving)
@@ -100,7 +109,7 @@ public class CarController : MonoBehaviour
             smoothFactorCarBody += Time.deltaTime * smooth;
             Quaternion targetRotation = car.transform.rotation;
             pivot.transform.rotation = Quaternion.Slerp(pivot.transform.rotation, targetRotation, smoothFactorCarBody);
-           // RotateWheels(0);
+            // RotateWheels(0);
             if (Quaternion.Angle(pivot.transform.rotation, targetRotation) < 0.1f)
             {
                 startMoving = false;
@@ -108,30 +117,47 @@ public class CarController : MonoBehaviour
         }
         CheckGround();
     }
-    private void Jump()
-    {
-        Debug.Log("car jumping");
-        rb.AddForce(Vector3.up * 10f, ForceMode.Impulse);
-        singleTap = false;
-    }
+
     private void CheckGround()
     {
-        if (singleTap)
+        if (isJump)
         {
-            return;
+            RaycastHit hit2;
+            Vector3 rayStart2 = transform.position + Vector3.up * 0.5f;
+            if (Physics.Raycast(rayStart2, Vector3.down, out hit2, raycastDistance*10f, groundLayer))
+            {
+                Debug.Log("is hitting");
+                if (Vector3.Distance(transform.position, hit2.point) > 2f)
+                {
+                isJump = false;
+                }
+                else
+                {
+                    return;
+
+                }
+            }
+            else
+            {
+                return;
+
+            }
+
         }
-        Debug.Log(raycastDistance);
         RaycastHit hit;
         Vector3 rayStart = transform.position + Vector3.up * 0.5f;
         if (Physics.Raycast(rayStart, Vector3.down, out hit, raycastDistance, groundLayer))
         {
-          
+            brakeSpeed = 0;
+            Physics.gravity = Vector3.down * 9.81f;
+
+            isGrounded = true;
             transform.position = hit.point + Vector3.up * 0.1f;
-            Debug.DrawRay(rayStart, Vector3.down * raycastDistance, Color.green);
+            Debug.DrawRay(rayStart, Vector3.down * raycastDistance, Color.red);
         }
         else
         {
-           // setSpeedForward =0;
+            // setSpeedForward =0;
             //transform.position = new Vector3(transform.position.x, transform.position.y - 2f, transform.position.z);
         }
     }

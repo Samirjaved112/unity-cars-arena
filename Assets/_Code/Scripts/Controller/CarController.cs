@@ -29,38 +29,36 @@ public class CarController : MonoBehaviour
     [SerializeField] private float raycastDistance;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private float jumpTime;
-     public bool isJump;
+    public bool isJump;
 
     public bool isGrounded;
-    public float brakeSpeed= 0;
+    public float brakeSpeed = 0;
+    public float initialSpeed = 0;
 
     private void Start()
     {
         touchDelta = 0;
         Application.targetFrameRate = 60;
+        initialSpeed = 10;
+        StartCoroutine(SetInitialSpeed());
+
     }
+
+    IEnumerator SetInitialSpeed()
+    {
+        while (initialSpeed >= 0)
+        {
+            initialSpeed -= Time.deltaTime;
+            yield return null;
+        }
+    }
+
     void Update()
     {
-        if (Mathf.Abs(touchDelta) > driftThreshold)
-        {
-            if (addForce)
-            {
-                moveSpeedForward = driftMoveSpeed- brakeSpeed;
-                rb.AddForce(moveDirection * driftForce, ForceMode.VelocityChange);
-                addForce = false;
-            }
-        }
-        else
-        {
-            addForce = true;
-            moveSpeedForward = setSpeedForward-brakeSpeed;
-        }
-        moveDirection = pivot.transform.forward;
-        transform.Translate(moveDirection * moveSpeedForward * Time.deltaTime);
 
+        MoveForward();
         if (Input.touchCount > 0)
         {
-
             Touch touch = Input.GetTouch(0);
             jumpTime += Time.deltaTime;
             if (touch.phase == TouchPhase.Began)
@@ -71,10 +69,7 @@ public class CarController : MonoBehaviour
             if (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary && jumpTime >= 0.5f)
             {
                 touchDelta = (touch.position.x - touchStartPositon.x) / Screen.width;
-                pivot.transform.Rotate(Vector3.up, touchDelta * pivotRotationSpeed * Time.deltaTime);
-                float desiredCarRotation = pivot.transform.rotation.eulerAngles.y + carRotationSpeed * touchDelta;
-                Quaternion targetRotation = Quaternion.Euler(0, desiredCarRotation, 0);
-                car.transform.rotation = Quaternion.Slerp(car.transform.rotation, targetRotation, carRotationSmoothness * Time.deltaTime);
+                RotateCar();
                 if (touchDelta > 0)
                 {
                     // RotateWheels(30f);
@@ -88,22 +83,30 @@ public class CarController : MonoBehaviour
             {
                 if (jumpTime < 0.5f)
                 {
-                    if (isGrounded)
-                    {
-                        brakeSpeed = jumpMoveSpeed;
-                        isJump = true;
-                        Debug.Log("jumping");
-                        rb.AddForce(Vector3.up * 20f, ForceMode.Impulse);
-                        Physics.gravity = Vector3.down * 15f; 
-                        isGrounded = false;
-                    }
+                    Jump();
                 }
                 touchDelta = 0;
                 startMoving = true;
                 smoothFactorCarBody = 0;
-
             }
         }
+        ReAlignCarRotation();
+        CheckGround();
+    }
+    private void Jump()
+    {
+        if (isGrounded)
+        {
+            brakeSpeed = jumpMoveSpeed;
+            isJump = true;
+            Debug.Log("jumping");
+            rb.AddForce(Vector3.up * 20f, ForceMode.Impulse);
+            Physics.gravity = Vector3.down * 15f;
+            isGrounded = false;
+        }
+    }
+    private void ReAlignCarRotation()
+    {
         if (startMoving)
         {
             smoothFactorCarBody += Time.deltaTime * smooth;
@@ -115,35 +118,45 @@ public class CarController : MonoBehaviour
                 startMoving = false;
             }
         }
-        CheckGround();
     }
-
+    private void MoveForward()
+    {
+        if (Mathf.Abs(touchDelta) > driftThreshold)
+        {
+            if (addForce)
+            {
+                moveSpeedForward = driftMoveSpeed - brakeSpeed - initialSpeed;
+                rb.AddForce(moveDirection * driftForce, ForceMode.VelocityChange);
+                addForce = false;
+            }
+        }
+        else
+        {
+            addForce = true;
+            moveSpeedForward = setSpeedForward - brakeSpeed - initialSpeed;
+        }
+        moveDirection = pivot.transform.forward;
+        transform.Translate(moveDirection * moveSpeedForward * Time.deltaTime);
+    }
+    private void RotateCar()
+    {
+        pivot.transform.Rotate(Vector3.up, touchDelta * pivotRotationSpeed * Time.deltaTime);
+        float desiredCarRotation = pivot.transform.rotation.eulerAngles.y + carRotationSpeed * touchDelta;
+        Quaternion targetRotation = Quaternion.Euler(0, desiredCarRotation, 0);
+        car.transform.rotation = Quaternion.Slerp(car.transform.rotation, targetRotation, carRotationSmoothness * Time.deltaTime);
+    }
     private void CheckGround()
     {
         if (isJump)
         {
             RaycastHit hit2;
             Vector3 rayStart2 = transform.position + Vector3.up * 0.5f;
-            if (Physics.Raycast(rayStart2, Vector3.down, out hit2, raycastDistance*10f, groundLayer))
-            {
-                Debug.Log("is hitting");
-                if (Vector3.Distance(transform.position, hit2.point) > 2f)
-                {
+            if (Physics.Raycast(rayStart2, Vector3.down, out hit2, raycastDistance * 10f, groundLayer) && (Vector3.Distance(transform.position, hit2.point) > 2f))
                 isJump = false;
-                }
-                else
-                {
-                    return;
-
-                }
-            }
             else
-            {
                 return;
-
-            }
-
         }
+
         RaycastHit hit;
         Vector3 rayStart = transform.position + Vector3.up * 0.5f;
         if (Physics.Raycast(rayStart, Vector3.down, out hit, raycastDistance, groundLayer))
@@ -154,11 +167,6 @@ public class CarController : MonoBehaviour
             isGrounded = true;
             transform.position = hit.point + Vector3.up * 0.1f;
             Debug.DrawRay(rayStart, Vector3.down * raycastDistance, Color.red);
-        }
-        else
-        {
-            // setSpeedForward =0;
-            //transform.position = new Vector3(transform.position.x, transform.position.y - 2f, transform.position.z);
         }
     }
     //private void RotateWheels(float rAmount)

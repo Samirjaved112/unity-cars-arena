@@ -47,7 +47,7 @@ public class AiCarController : MonoBehaviour
                 {
                     isBoundry = true;
                     float dir = GetBestDirection();
-                    float angle = Random.Range(90f, 120f);
+                    float angle = Random.Range(90f, 180f);
 
                     StartCoroutine(SteerTowardsTarget(angle * dir));
                 }
@@ -147,10 +147,6 @@ public class AiCarController : MonoBehaviour
             Debug.DrawRay(rayStart, Vector3.down * raycastDistance, Color.red);
         }
     }
-
-
-
-
 
     private float GetBestDirection()
     {

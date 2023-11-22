@@ -1085,7 +1085,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &342589412
 Transform:
   m_ObjectHideFlags: 0
@@ -1094,7 +1094,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 342589411}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 49.98, y: 1.05, z: 26.6}
+  m_LocalPosition: {x: 51, y: 1.05, z: 35.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1331,7 +1331,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 363067181}
   m_LocalRotation: {x: -0.56733936, y: -0, z: -0, w: 0.82348406}
-  m_LocalPosition: {x: 49.98, y: 4.5999985, z: -21.560001}
+  m_LocalPosition: {x: 51, y: 13.700001, z: -21.560001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2789,7 +2789,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   m_LocalRotation: {x: -0.56733936, y: -0, z: -0, w: 0.82348406}
-  m_LocalPosition: {x: 49.98, y: 4.5999985, z: -21.560001}
+  m_LocalPosition: {x: 51, y: 13.700001, z: -21.560001}
   m_LocalScale: {x: 10, y: 10, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4540,7 +4540,7 @@ GameObject:
   - component: {fileID: 1654356325}
   m_Layer: 0
   m_Name: AiCar
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

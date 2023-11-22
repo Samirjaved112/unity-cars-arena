@@ -30,7 +30,6 @@ public class CarController : MonoBehaviour
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private float jumpTime;
     public bool isJump;
-
     public bool isGrounded;
     public float brakeSpeed = 0;
     public float initialSpeed = 0;

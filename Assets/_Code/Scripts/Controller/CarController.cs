@@ -38,7 +38,7 @@ public class CarController : MonoBehaviour
     {
         touchDelta = 0;
         Application.targetFrameRate = 60;
-        initialSpeed = 10;
+        //initialSpeed = 10;
         StartCoroutine(SetInitialSpeed());
 
     }

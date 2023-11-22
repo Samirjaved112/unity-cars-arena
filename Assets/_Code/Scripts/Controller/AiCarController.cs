@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class AiCarController : MonoBehaviour
@@ -23,6 +22,7 @@ public class AiCarController : MonoBehaviour
     public float brakeSpeed = 0;
     private Transform target; // Target point for the AI car to move towards
     private bool isBoundry;
+    private Vector3 targetPoint;
     private void Start()
     {
         Application.targetFrameRate = 60;
@@ -46,8 +46,10 @@ public class AiCarController : MonoBehaviour
                 if (hit.collider.CompareTag("Wall") && !isBoundry)
                 {
                     isBoundry = true;
-                    StartCoroutine(SteerTowardsTarget());
+                    float dir = GetBestDirection();
+                    float angle = Random.Range(90f, 120f);
 
+                    StartCoroutine(SteerTowardsTarget(angle * dir));
                 }
                 else
                 {
@@ -74,20 +76,18 @@ public class AiCarController : MonoBehaviour
         transform.Translate(moveDirection * moveSpeedForward * Time.deltaTime);
     }
 
-    private IEnumerator SteerTowardsTarget()
+    private IEnumerator SteerTowardsTarget(float xCount)
     {
         Vector3 startRot = pivot.transform.localEulerAngles;
         Vector3 startPos = new Vector3(pivot.transform.localPosition.x, 0, 0);
         Vector3 targetPos = new Vector3(pivot.transform.localPosition.x, 0, 0);
-        targetPos.x -= 90;
+        targetPos.x += xCount;
         Vector3 directionToTarget = targetPos - startPos;
-        Debug.Log("position start " + startPos);
-        Debug.Log("position is " + targetPos);
+
 
         float startAngle = Mathf.DeltaAngle(startPos.x, startPos.x);
         float angleToTarget = Mathf.DeltaAngle(startPos.x, targetPos.x);
-        Debug.Log("angle is " + startAngle);
-        Debug.Log("angleToTarget is " + angleToTarget);
+
         float currentAngle = startAngle;
         Quaternion targetRotation = Quaternion.Euler(0, car.transform.rotation.eulerAngles.y + angleToTarget, 0);
         float lerpTime = 0f;
@@ -95,17 +95,41 @@ public class AiCarController : MonoBehaviour
         {
             lerpTime += carRotationSmoothness * Time.deltaTime;
             currentAngle = Mathf.Lerp(startAngle, angleToTarget, lerpTime);
-            Debug.Log("currentAngle is " + currentAngle);
+
             pivot.transform.localRotation = Quaternion.Euler(0f, startRot.y + currentAngle, 0f);
             //pivot.transform.RotateAroundLocal(Vector3.up, currentAngle);
             //carRotationSmoothness += Time.deltaTime;
             car.transform.rotation = Quaternion.Lerp(car.transform.rotation, targetRotation, lerpTime);
             yield return null;
         }
-        Debug.Log("local angle issss" + pivot.transform.eulerAngles.y);
+
         isBoundry = false;
     }
+    private void OnTriggerEnter(Collider other)
+    {
 
+        if (other.gameObject.CompareTag("Player"))
+        {
+            Vector3 rightVector = gameObject.transform.right;
+            targetPoint = gameObject.transform.position - other.gameObject.transform.position;
+            // Calculate the dot product
+            float dotProduct = Vector3.Dot(targetPoint, rightVector);
+            Debug.Log(dotProduct);
+            if (dotProduct > 0)
+            {
+                Debug.Log("is on right");
+                StartCoroutine(SteerTowardsTarget(-90));
+            }
+            else if (dotProduct < 0)
+            {
+                Debug.Log("is on left");
+                StartCoroutine(SteerTowardsTarget(90));
+
+
+            }
+            //targetPoint = gameObject.transform.position - other.gameObject.transform.position;
+        }
+    }
     private void ReAlignCarRotation()
     {
         // Implement any additional AI car realignment logic if needed
@@ -122,5 +146,43 @@ public class AiCarController : MonoBehaviour
             transform.position = hit.point + Vector3.up * 0.1f;
             Debug.DrawRay(rayStart, Vector3.down * raycastDistance, Color.red);
         }
+    }
+
+
+
+
+
+    private float GetBestDirection()
+    {
+        float rightDist = 0f;
+        float leftDist = 0f;
+        RaycastHit hit;
+        Vector3 rayStart = pivot.transform.position + Vector3.up * 0.5f;
+        if (Physics.Raycast(rayStart, pivot.transform.right, out hit, 150f, boundaryLayer))
+        {
+            if (hit.collider.CompareTag("Wall"))
+            {
+                rightDist = hit.distance;
+                Debug.DrawRay(rayStart, -pivot.transform.right, Color.green);
+            }
+        }
+        else
+        {
+            Debug.DrawRay(rayStart, -pivot.transform.right, Color.red);
+        }
+        rayStart = pivot.transform.position + Vector3.up * 0.5f;
+        if (Physics.Raycast(rayStart, -pivot.transform.right, out hit, 150f, boundaryLayer))
+        {
+            if (hit.collider.CompareTag("Wall"))
+            {
+                leftDist = hit.distance;
+                Debug.DrawRay(rayStart, -pivot.transform.right, Color.green);
+            }
+        }
+        else
+        {
+            Debug.DrawRay(rayStart, -pivot.transform.right, Color.red);
+        }
+        return (leftDist >= rightDist) ? -1f : 1f;
     }
 }

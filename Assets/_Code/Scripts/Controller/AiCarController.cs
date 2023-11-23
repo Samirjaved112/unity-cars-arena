@@ -23,6 +23,9 @@ public class AiCarController : MonoBehaviour
     private Transform target; //Target point for the AI car to move towards
     private bool isBoundry;
     private Vector3 targetPoint;
+    private bool isGrounded;
+    private bool isJump;
+
     private void Start()
     {
         Application.targetFrameRate = 60;
@@ -37,32 +40,47 @@ public class AiCarController : MonoBehaviour
 
     private void Update()
     {
-        RaycastHit hit;
-        Vector3 rayStart = pivot.transform.position + Vector3.up * 0.5f;
-        if (Physics.Raycast(rayStart, pivot.transform.forward, out hit, forwardRayDistance, boundaryLayer))
-        {
-            if (hit.collider.isTrigger)
-            {
-                if (hit.collider.CompareTag("Wall") && !isBoundry)
-                {
-                    isBoundry = true;
-                    float dir = GetBestDirection();
-                    float angle = Random.Range(90f, 180f);
-
-                    StartCoroutine(SteerTowardsTarget(angle * dir));
-                }
-                else
-                {
-                    // isBoundry = false;
-                }
-            }
-        }
         MoveForward();
+        Jump();
+        CheckBoundary();
 
-        ReAlignCarRotation();
         CheckGround();
     }
 
+
+    private void Jump()
+    {
+
+        RaycastHit hit;
+        Vector3 rayStart = car.transform.position + Vector3.up * 1.5f + Vector3.forward * 4f;
+        Vector3 direction = (-car.transform.up).normalized;
+        if (Physics.Raycast(rayStart, direction, out hit, 20f))
+        {
+            Debug.Log("Hit Info = " + hit.collider.gameObject.name);
+            if (hit.collider.CompareTag("RedHex"))
+            {
+
+                Debug.Log("Hit Dist = " + hit.distance);
+                Debug.DrawRay(rayStart, hit.transform.position, Color.green);
+
+                if (isGrounded)
+                {
+                    //brakeSpeed = jumpMoveSpeed;
+                    isJump = true;
+                    Debug.Log("jumping");
+                    rb.AddForce(Vector3.up * 20f, ForceMode.Impulse);
+                    Physics.gravity = Vector3.down * 15f;
+                    isGrounded = false;
+                }
+            }
+            else
+            {
+                Debug.DrawRay(rayStart, hit.transform.position, Color.yellow);
+            }
+
+        }
+
+    }
     private void MoveForward()
     {
         if (addForce)
@@ -105,43 +123,42 @@ public class AiCarController : MonoBehaviour
 
         isBoundry = false;
     }
-    private void OnTriggerEnter(Collider other)
+
+    private void CheckBoundary()
     {
-
-        if (other.gameObject.CompareTag("Player"))
+        RaycastHit hit;
+        Vector3 rayStart = pivot.transform.position + Vector3.up * 0.5f;
+        if (Physics.Raycast(rayStart, pivot.transform.forward, out hit, forwardRayDistance, boundaryLayer))
         {
-            Vector3 rightVector = gameObject.transform.right;
-            targetPoint = gameObject.transform.position - other.gameObject.transform.position;
-            // Calculate the dot product
-            float dotProduct = Vector3.Dot(targetPoint, rightVector);
-            Debug.Log(dotProduct);
-            if (dotProduct > 0)
+            if (hit.collider.CompareTag("Wall") && !isBoundry)
             {
-                Debug.Log("is on right");
-                StartCoroutine(SteerTowardsTarget(-90));
-            }
-            else if (dotProduct < 0)
-            {
-                Debug.Log("is on left");
-                StartCoroutine(SteerTowardsTarget(90));
+                isBoundry = true;
+                float dir = GetBestDirection();
+                float angle = Random.Range(90f, 180f);
 
-
+                StartCoroutine(SteerTowardsTarget(angle * dir));
             }
-            //targetPoint = gameObject.transform.position - other.gameObject.transform.position;
         }
     }
-    private void ReAlignCarRotation()
-    {
-        // Implement any additional AI car realignment logic if needed
-    }
-
     private void CheckGround()
     {
+        if (isJump)
+        {
+            RaycastHit hit2;
+            Vector3 rayStart2 = transform.position + Vector3.up * 0.5f;
+            if (Physics.Raycast(rayStart2, Vector3.down, out hit2, raycastDistance * 10f, groundLayer) && (Vector3.Distance(transform.position, hit2.point) > 2f))
+                isJump = false;
+            else
+                return;
+        }
+
         RaycastHit hit;
         Vector3 rayStart = transform.position + Vector3.up * 0.5f;
 
         if (Physics.Raycast(rayStart, Vector3.down, out hit, raycastDistance, groundLayer))
         {
+            Physics.gravity = Vector3.down * 9.81f;
+            isGrounded = true;
             brakeSpeed = 0;
             transform.position = hit.point + Vector3.up * 0.1f;
             Debug.DrawRay(rayStart, Vector3.down * raycastDistance, Color.red);
@@ -180,5 +197,30 @@ public class AiCarController : MonoBehaviour
             Debug.DrawRay(rayStart, -pivot.transform.right, Color.red);
         }
         return (leftDist >= rightDist) ? -1f : 1f;
+    }
+
+
+
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Car"))
+        {
+            Vector3 rightVector = gameObject.transform.right;
+            targetPoint = gameObject.transform.position - other.gameObject.transform.position;
+            // Calculate the dot product
+            float dotProduct = Vector3.Dot(targetPoint, rightVector);
+            Debug.Log(dotProduct);
+            if (dotProduct > 0)
+            {
+                Debug.Log("is on right");
+                StartCoroutine(SteerTowardsTarget(-90));
+            }
+            else if (dotProduct < 0)
+            {
+                Debug.Log("is on left");
+                StartCoroutine(SteerTowardsTarget(90));
+            }
+        }
     }
 }

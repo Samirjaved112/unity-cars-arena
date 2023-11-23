@@ -4,49 +4,50 @@ using UnityEngine;
 
 public class DestroyFloor : MonoBehaviour
 {
+    [SerializeField] private Material m_Material;
+
     [SerializeField] private float lerpDuration;
     [SerializeField] private float lerpValue;
-    private MeshRenderer floorMesh;
-    [SerializeField] private Material RedMaterial;
-     private Material whiteMaterial;
-    [SerializeField] private Color startingColor;
-    [SerializeField] private Color finalColor;
+
+    [SerializeField] private Color whiteColor;
+    [SerializeField] private Color redColor;
+
+
     private void Awake()
     {
-        
-        whiteMaterial = GetComponent<MeshRenderer>().material;
-        floorMesh = GetComponent<MeshRenderer>();
+        m_Material = GetComponent<MeshRenderer>().material;
     }
 
-    private void Start()
-    {
-    }
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Player"))
+        if (other.gameObject.CompareTag("CarTrig"))
         {
             StartCoroutine(ChangePosition());
         }
     }
-    //private void OnTriggerEnter(Collision collision)
-    //{
 
-    //}
     private IEnumerator ChangePosition()
     {
-        
+
         Vector3 targetPosition = new Vector3(transform.position.x, transform.position.y - 3, transform.position.z);
         Vector3 secondTarget = transform.position;
         yield return new WaitForSeconds(0.1f);
-        while (whiteMaterial.color != finalColor)
+
+
+        while (m_Material.color != redColor)
         {
             lerpDuration += Time.deltaTime;
-            Color lerpedColor = Color.Lerp(startingColor, finalColor, lerpDuration);
-            whiteMaterial.color = lerpedColor;
+            Color lerpedColor = Color.Lerp(whiteColor, redColor, lerpDuration);
+            m_Material.color = lerpedColor;
             yield return null;
         }
+
+        // Change Platform Tag to RedHex
+        tag = "RedHex";
+
         lerpDuration = lerpValue;
 
+        // Moving Downward
         yield return new WaitForSeconds(0.2f);
         while (Vector3.Distance(transform.position, targetPosition) >= 0.1)
         {
@@ -57,8 +58,9 @@ public class DestroyFloor : MonoBehaviour
         transform.position = targetPosition;
         lerpDuration = lerpValue;
 
-                                         // setting position back 
-        whiteMaterial.color = Color.white;
+        m_Material.color = Color.white;
+
+        // Moving Upward
         yield return new WaitForSeconds(3f);
         while (Vector3.Distance(secondTarget, transform.position) > 0.1)
         {
@@ -66,9 +68,15 @@ public class DestroyFloor : MonoBehaviour
             transform.position = Vector3.Lerp(transform.position, secondTarget, lerpDuration);
         }
         transform.position = secondTarget;
-       // floorMesh.material = whiteMaterial;
         lerpDuration = lerpValue;
 
+        // Change Platform Tag to WhiteHex
+        tag = "WhiteHex";
 
+    }
+
+    public void ChangeColor()
+    {
+        m_Material.color = Color.green;
     }
 }

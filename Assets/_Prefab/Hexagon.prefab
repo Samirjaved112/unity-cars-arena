@@ -196,8 +196,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e45105ab3764fe4bbfad905dbe061f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
   lerpDuration: 0.05
   lerpValue: 0.05
-  RedMaterial: {fileID: 2100000, guid: 0121df81891c4d24f848303e62d4231b, type: 2}
-  startingColor: {r: 1, g: 1, b: 1, a: 0}
-  finalColor: {r: 1, g: 0.06132078, b: 0.06132078, a: 0}
+  whiteColor: {r: 1, g: 1, b: 1, a: 1}
+  redColor: {r: 0.8962264, g: 0.021137413, b: 0.021137413, a: 1}

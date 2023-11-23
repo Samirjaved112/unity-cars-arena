@@ -1093,7 +1093,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 342589411}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 62.6, y: 1.05, z: 46}
+  m_LocalPosition: {x: 75.9, y: 1.05, z: 46}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1120,7 +1120,7 @@ MonoBehaviour:
   carRotationSpeed: 187.5
   pivotRotationSpeed: 250
   carRotationSmoothness: 2
-  setSpeedForward: 15
+  setSpeedForward: 25
   driftMoveSpeed: 8
   jumpMoveSpeed: 10
   driftForce: 12
@@ -1317,8 +1317,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 363067181}
-  m_LocalRotation: {x: -0.40116948, y: -0.40116948, z: 0.58229125, w: 0.5822912}
-  m_LocalPosition: {x: 84.6, y: 46.000008, z: -21.560009}
+  m_LocalRotation: {x: -0.40116945, y: -0.40116954, z: 0.5822913, w: 0.5822911}
+  m_LocalPosition: {x: 97.9, y: 46.000008, z: -21.560009}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -15565,8 +15565,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: -0.40116948, y: -0.40116948, z: 0.58229125, w: 0.5822912}
-  m_LocalPosition: {x: 84.6, y: 46.000008, z: -21.560009}
+  m_LocalRotation: {x: -0.40116945, y: -0.40116954, z: 0.5822913, w: 0.5822911}
+  m_LocalPosition: {x: 97.9, y: 46.000008, z: -21.560009}
   m_LocalScale: {x: 10, y: 10, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -15744,7 +15744,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &970099558
 Transform:
   m_ObjectHideFlags: 0

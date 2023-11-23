@@ -73,10 +73,6 @@ public class AiCarController : MonoBehaviour
                     isGrounded = false;
                 }
             }
-            else
-            {
-                Debug.DrawRay(rayStart, hit.transform.position, Color.yellow);
-            }
 
         }
 

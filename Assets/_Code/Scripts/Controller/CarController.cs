@@ -38,24 +38,27 @@ public class CarController : MonoBehaviour
     {
         touchDelta = 0;
         Application.targetFrameRate = 60;
-        //initialSpeed = 10;
         StartCoroutine(SetInitialSpeed());
-
     }
 
     IEnumerator SetInitialSpeed()
     {
+
         while (initialSpeed >= 0)
         {
-            initialSpeed -= Time.deltaTime;
+            initialSpeed -= Time.deltaTime * 10f;
             yield return null;
         }
+
+        rb.useGravity = true;
+        Debug.Log("UPDATE");
     }
 
     void Update()
     {
-
+        CheckGround();
         MoveForward();
+     
         if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
@@ -89,8 +92,8 @@ public class CarController : MonoBehaviour
                 smoothFactorCarBody = 0;
             }
         }
+        
         ReAlignCarRotation();
-        CheckGround();
     }
     private void Jump()
     {

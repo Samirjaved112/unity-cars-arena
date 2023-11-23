@@ -20,7 +20,7 @@ public class AiCarController : MonoBehaviour
     private Vector3 moveDirection;
     private bool addForce = true;
     public float brakeSpeed = 0;
-    private Transform target; // Target point for the AI car to move towards
+    private Transform target; //Target point for the AI car to move towards
     private bool isBoundry;
     private Vector3 targetPoint;
     private void Start()

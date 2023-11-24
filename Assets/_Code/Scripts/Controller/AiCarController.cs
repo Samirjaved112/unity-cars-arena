@@ -219,16 +219,13 @@ public class AiCarController : MonoBehaviour
     }
 
 
-
-
-
-
     private void OnTriggerEnter(Collider other)
     {
         if (isDead) return;
         if (other.gameObject.CompareTag("DeadZone"))
         {
             isDead = true;
+            GameManager.Instance.RemovePlayer(this.gameObject);
         }
         if (other.gameObject.CompareTag("Car"))
         {

@@ -1,8 +1,10 @@
+using Cinemachine;
 using System.Collections;
 using UnityEngine;
 
 public class CarController : MonoBehaviour
 {
+    [SerializeField] private CinemachineVirtualCamera virtualCamera;
     [SerializeField] private GameObject pivot;
     [SerializeField] private GameObject car;
     [SerializeField] private float carRotationSpeed;
@@ -38,7 +40,6 @@ public class CarController : MonoBehaviour
     private float prevY;
     public bool isDead = false;
     public bool isCollidedCar;
-
     private void Start()
     {
         touchDelta = 0;
@@ -59,9 +60,10 @@ public class CarController : MonoBehaviour
 
     void Update()
     {
+        if (isDead) return;
         CheckGround();
         MoveForward();
-     
+
         if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
@@ -95,7 +97,7 @@ public class CarController : MonoBehaviour
                 smoothFactorCarBody = 0;
             }
         }
-        
+
         ReAlignCarRotation();
     }
     private void Jump()
@@ -129,7 +131,7 @@ public class CarController : MonoBehaviour
         {
             if (addForce)
             {
-                
+
                 moveSpeedForward = driftMoveSpeed - brakeSpeed - initialSpeed;
                 rb.AddForce(moveDirection * driftForce, ForceMode.VelocityChange);
                 addForce = false;
@@ -182,6 +184,25 @@ public class CarController : MonoBehaviour
             isGrounded = true;
             transform.position = hit.point + Vector3.up * 0.1f;
             Debug.DrawRay(rayStart, Vector3.down * raycastDistance, Color.red);
+        }
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (isDead) { 
+        
+        return;
+        
+        }
+        if (other.gameObject.CompareTag("DeadZone"))
+        {
+            isDead = true;
+
+            virtualCamera.Follow = null;
+            virtualCamera.LookAt = null;
+
+
+            GameManager.Instance.RemovePlayer(gameObject);
+            GameManager.Instance.GameEnd(false);
         }
     }
     private void OnCollisionEnter(Collision collision)

@@ -1275,7 +1275,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &342589412
 Transform:
   m_ObjectHideFlags: 0
@@ -1311,7 +1311,7 @@ MonoBehaviour:
   carRotationSpeed: 187.5
   pivotRotationSpeed: 250
   carRotationSmoothness: 2
-  setSpeedForward: 25
+  setSpeedForward: 20
   driftMoveSpeed: 8
   jumpMoveSpeed: 10
   driftForce: 12
@@ -1325,6 +1325,8 @@ MonoBehaviour:
   smooth: 0.4
   rb: {fileID: 342589414}
   rAmount: 0
+  collisionJumpForce: 20
+  hurdleJumpForce: 20
   carTyre:
   - {fileID: 0}
   - {fileID: 0}
@@ -1337,6 +1339,8 @@ MonoBehaviour:
   isGrounded: 0
   brakeSpeed: 0
   initialSpeed: 10
+  isDead: 0
+  isCollidedCar: 0
 --- !u!54 &342589414
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1481,8 +1485,8 @@ MonoBehaviour:
   m_StreamingVersion: 20170927
   m_Priority: 10
   m_StandbyUpdate: 2
-  m_LookAt: {fileID: 662962402}
-  m_Follow: {fileID: 662962402}
+  m_LookAt: {fileID: 261786958832434390}
+  m_Follow: {fileID: 261786958832434390}
   m_Lens:
     FieldOfView: 60
     OrthographicSize: 5
@@ -1508,8 +1512,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 363067181}
-  m_LocalRotation: {x: -0.000000004880929, y: 0.56733936, z: -0.82348406, w: 0.0000000070845907}
-  m_LocalPosition: {x: 49, y: 97.000015, z: -21.610016}
+  m_LocalRotation: {x: -0.56733936, y: -0, z: -0, w: 0.82348406}
+  m_LocalPosition: {x: 49, y: -7.000004, z: -21.61}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2762,8 +2766,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: -0.000000004880929, y: 0.56733936, z: -0.82348406, w: 0.0000000070845907}
-  m_LocalPosition: {x: 49, y: 97.000015, z: -21.610016}
+  m_LocalRotation: {x: -0.56733936, y: -0, z: -0, w: 0.82348406}
+  m_LocalPosition: {x: 49, y: -7.000004, z: -21.61}
   m_LocalScale: {x: 10, y: 10, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3029,7 +3033,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 983248128}
-  - component: {fileID: 983248132}
   - component: {fileID: 983248131}
   - component: {fileID: 983248130}
   - component: {fileID: 983248129}
@@ -3075,10 +3078,10 @@ MonoBehaviour:
   carRotationSpeed: 187.5
   pivotRotationSpeed: 250
   carRotationSmoothness: 1
-  setSpeedForward: 25
+  setSpeedForward: 17
   driftForce: 8
   rb: {fileID: 983248130}
-  raycastDistance: 2.5
+  raycastDistance: 1
   forwardRayDistance: 20
   groundLayer:
     serializedVersion: 2
@@ -3087,11 +3090,15 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   carDetectionCollider: {fileID: 983248131}
+  collisionJumpForce: 20
+  hurdleJumpForce: 12
   brakeSpeed: 20
   isGrounded: 0
   isCollidedCar: 0
   initialSpeed: 0
   isDead: 0
+  prevY: 0
+  currY: 0
 --- !u!54 &983248130
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3117,23 +3124,10 @@ BoxCollider:
   m_GameObject: {fileID: 983248127}
   m_Material: {fileID: 0}
   m_IsTrigger: 1
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 7.573689, y: 0.4915372, z: 14.2612}
   m_Center: {x: 2.14, y: 0.5084627, z: 0}
---- !u!65 &983248132
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 983248127}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.90586853, y: 0.86392176, z: 0.91794777}
-  m_Center: {x: -0.0049438477, y: 0.22869688, z: 0.06884098}
 --- !u!4 &983992153 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5231857904784350407, guid: 470f68564129bc94ca1b6a5a5bc32cf2, type: 3}
@@ -3160,7 +3154,7 @@ GameObject:
   - component: {fileID: 998941229}
   m_Layer: 0
   m_Name: PLAYERCAR
-  m_TagString: Untagged
+  m_TagString: Car
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3913,7 +3907,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1309740519}
-  - component: {fileID: 1309740523}
   - component: {fileID: 1309740522}
   - component: {fileID: 1309740521}
   - component: {fileID: 1309740520}
@@ -3959,10 +3952,10 @@ MonoBehaviour:
   carRotationSpeed: 187.5
   pivotRotationSpeed: 250
   carRotationSmoothness: 1
-  setSpeedForward: 25
+  setSpeedForward: 17
   driftForce: 8
   rb: {fileID: 1309740521}
-  raycastDistance: 2.5
+  raycastDistance: 1
   forwardRayDistance: 20
   groundLayer:
     serializedVersion: 2
@@ -3971,11 +3964,15 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   carDetectionCollider: {fileID: 1309740522}
+  collisionJumpForce: 20
+  hurdleJumpForce: 12
   brakeSpeed: 20
   isGrounded: 0
   isCollidedCar: 0
   initialSpeed: 0
   isDead: 0
+  prevY: 0
+  currY: 0
 --- !u!54 &1309740521
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -4005,19 +4002,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 7.573689, y: 0.4915372, z: 14.2612}
   m_Center: {x: -2.14, y: 0.5084627, z: 0}
---- !u!65 &1309740523
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1309740518}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.90586853, y: 0.86392176, z: 0.91794777}
-  m_Center: {x: -0.0049438477, y: 0.22869688, z: 0.06884098}
 --- !u!1001 &1315147458
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5034,7 +5018,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1654356323}
-  - component: {fileID: 1654356321}
   - component: {fileID: 1654356325}
   - component: {fileID: 1654356322}
   - component: {fileID: 1654356324}
@@ -5044,20 +5027,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!65 &1654356321
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1654356319}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.90586853, y: 0.86392176, z: 0.91794777}
-  m_Center: {x: -0.0049438477, y: 0.22869688, z: 0.06884098}
+  m_IsActive: 1
 --- !u!54 &1654356322
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5109,10 +5079,10 @@ MonoBehaviour:
   carRotationSpeed: 187.5
   pivotRotationSpeed: 250
   carRotationSmoothness: 1
-  setSpeedForward: 25
+  setSpeedForward: 17
   driftForce: 8
   rb: {fileID: 1654356322}
-  raycastDistance: 2.5
+  raycastDistance: 1
   forwardRayDistance: 20
   groundLayer:
     serializedVersion: 2
@@ -5121,11 +5091,15 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   carDetectionCollider: {fileID: 1654356325}
+  collisionJumpForce: 20
+  hurdleJumpForce: 12
   brakeSpeed: 20
   isGrounded: 0
   isCollidedCar: 0
   initialSpeed: 0
   isDead: 0
+  prevY: 0
+  currY: 0
 --- !u!65 &1654356325
 BoxCollider:
   m_ObjectHideFlags: 0

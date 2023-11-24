@@ -18,6 +18,8 @@ public class CarController : MonoBehaviour
     [SerializeField] private float smooth;
     [SerializeField] private Rigidbody rb;
     [SerializeField] private float rAmount;
+    [SerializeField] private float collisionJumpForce;
+    [SerializeField] private float hurdleJumpForce;
     [SerializeField] private GameObject[] carTyre;
     private Vector3 touchStartPositon;
     private float moveSpeedForward;
@@ -32,6 +34,10 @@ public class CarController : MonoBehaviour
     public bool isGrounded;
     public float brakeSpeed = 0;
     public float initialSpeed = 0;
+    private float currY;
+    private float prevY;
+    public bool isDead = false;
+    public bool isCollidedCar;
 
     private void Start()
     {
@@ -96,11 +102,10 @@ public class CarController : MonoBehaviour
     {
         if (isGrounded)
         {
-            brakeSpeed = jumpMoveSpeed;
+            //brakeSpeed = jumpMoveSpeed;
             isJump = true;
             Debug.Log("jumping");
-            rb.AddForce(Vector3.up * 20f, ForceMode.Impulse);
-            Physics.gravity = Vector3.down * 15f;
+            rb.AddForce(Vector3.up * hurdleJumpForce, ForceMode.Impulse);
             isGrounded = false;
         }
     }
@@ -124,6 +129,7 @@ public class CarController : MonoBehaviour
         {
             if (addForce)
             {
+                
                 moveSpeedForward = driftMoveSpeed - brakeSpeed - initialSpeed;
                 rb.AddForce(moveDirection * driftForce, ForceMode.VelocityChange);
                 addForce = false;
@@ -134,8 +140,11 @@ public class CarController : MonoBehaviour
             addForce = true;
             moveSpeedForward = setSpeedForward - brakeSpeed - initialSpeed;
         }
-        moveDirection = pivot.transform.forward;
-        transform.Translate(moveDirection * moveSpeedForward * Time.deltaTime);
+        if (!isCollidedCar)
+        {
+            moveDirection = pivot.transform.forward;
+            transform.Translate(moveDirection * moveSpeedForward * Time.deltaTime);
+        }
     }
     private void RotateCar()
     {
@@ -146,14 +155,22 @@ public class CarController : MonoBehaviour
     }
     private void CheckGround()
     {
+
         if (isJump)
         {
-            RaycastHit hit2;
-            Vector3 rayStart2 = transform.position + Vector3.up * 0.5f;
-            if (Physics.Raycast(rayStart2, Vector3.down, out hit2, raycastDistance * 10f, groundLayer) && (Vector3.Distance(transform.position, hit2.point) > 2f))
+            currY = transform.position.y;
+            if (currY < prevY)
+            {
+                Debug.Log("coming down");
                 isJump = false;
+                rb.AddForce(Vector3.down * 5f, ForceMode.VelocityChange);
+            }
             else
-                return;
+            {
+                Debug.Log("going up");
+            }
+            prevY = currY;
+            return;
         }
 
         RaycastHit hit;
@@ -161,11 +178,33 @@ public class CarController : MonoBehaviour
         if (Physics.Raycast(rayStart, Vector3.down, out hit, raycastDistance, groundLayer))
         {
             brakeSpeed = 0;
-            Physics.gravity = Vector3.down * 9.81f;
-
+            isCollidedCar = false;
             isGrounded = true;
             transform.position = hit.point + Vector3.up * 0.1f;
             Debug.DrawRay(rayStart, Vector3.down * raycastDistance, Color.red);
+        }
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (isDead || isCollidedCar) return;
+
+        if (collision.collider.CompareTag("Car"))
+        {
+            isCollidedCar = true;
+            Vector3 dir = (car.transform.position - collision.contacts[0].point);
+            CarCollisionJump(dir.normalized + (Vector3.up));
+            //carDetectionCollider.enabled = true;
+        }
+    }
+    private void CarCollisionJump(Vector3 direction)
+    {
+        if (isGrounded)
+        {
+            isJump = true;
+            Debug.Log("jumping from collision");
+
+            rb.AddForce(direction * collisionJumpForce, ForceMode.Impulse);
+            isGrounded = false;
         }
     }
     //private void RotateWheels(float rAmount)

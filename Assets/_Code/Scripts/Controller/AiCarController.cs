@@ -16,7 +16,8 @@ public class AiCarController : MonoBehaviour
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask boundaryLayer;
     [SerializeField] private BoxCollider carDetectionCollider;
-
+    [SerializeField] private float collisionJumpForce;
+    [SerializeField] private float hurdleJumpForce;
 
     private float moveSpeedForward;
     private Vector3 moveDirection;
@@ -30,6 +31,7 @@ public class AiCarController : MonoBehaviour
     public float initialSpeed = 0;
 
     public bool isDead = false;
+    public float prevY,currY;
 
     private void Start()
     {
@@ -87,20 +89,20 @@ public class AiCarController : MonoBehaviour
                 if (isGrounded)
                 {
                     isJump = true;
-                    rb.AddForce(Vector3.up * 20f, ForceMode.Impulse);
-                    Physics.gravity = Vector3.down * 15f;
+                    Debug.Log("jumping from red");
+                    rb.AddForce(Vector3.up * hurdleJumpForce, ForceMode.Impulse);
                     isGrounded = false;
                 }
             }
-
         }
         else
         {
             if (isGrounded)
             {
                 isJump = true;
-                rb.AddForce(Vector3.up * 20f, ForceMode.Impulse);
-                Physics.gravity = Vector3.down * 15f;
+                Debug.Log("jumping from empty");
+
+                rb.AddForce(Vector3.up * 12f, ForceMode.Impulse);
                 isGrounded = false;
             }
         }
@@ -110,10 +112,9 @@ public class AiCarController : MonoBehaviour
         if (isGrounded)
         {
             isJump = true;
+            Debug.Log("jumping from collision");
 
-            isCollidedCar = true;
-            rb.AddForce(direction * 20f, ForceMode.Impulse);
-            //Physics.gravity = Vector3.down * 1f;
+            rb.AddForce(direction * collisionJumpForce, ForceMode.Impulse);
             isGrounded = false;
         }
     }
@@ -166,20 +167,25 @@ public class AiCarController : MonoBehaviour
     {
         if (isJump)
         {
-            RaycastHit hit2;
-            Vector3 rayStart2 = transform.position + Vector3.up * 0.5f;
-            if (Physics.Raycast(rayStart2, Vector3.down, out hit2, raycastDistance * 10f, groundLayer) && (Vector3.Distance(transform.position, hit2.point) > 1f))
+            currY = transform.position.y;
+            if (currY < prevY)
+            {
+                Debug.Log("coming down");
                 isJump = false;
+                rb.AddForce(Vector3.down * 5f, ForceMode.VelocityChange);
+            }
             else
-                return;
+            {
+                Debug.Log("going up");
+            }
+            prevY = currY;
+            return;
         }
-
         RaycastHit hit;
         Vector3 rayStart = transform.position + Vector3.up * 0.5f;
 
         if (Physics.Raycast(rayStart, Vector3.down, out hit, raycastDistance, groundLayer))
         {
-            Physics.gravity = Vector3.down * 9.81f;
             isGrounded = true;
             isCollidedCar = false;
             brakeSpeed = 0;
@@ -228,12 +234,8 @@ public class AiCarController : MonoBehaviour
         {
             Vector3 rightVector = gameObject.transform.right;
             Vector3 targetPoint = gameObject.transform.position - other.gameObject.transform.position;
-
-
             // Align Pivot & Car
-
             pivot.transform.rotation = Quaternion.Lerp(pivot.transform.rotation, car.transform.rotation, 1f);
-
             // Calculate the dot product
             float dotProduct = Vector3.Dot(targetPoint, rightVector);
             if (dotProduct > 0)
@@ -245,15 +247,16 @@ public class AiCarController : MonoBehaviour
                 StartCoroutine(SteerTowardsTarget(90));
             }
         }
+      
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (isDead) return;
+        if (isDead || isCollidedCar) return;
 
-        Debug.Log("CHECKING COL");
         if (collision.collider.CompareTag("Car"))
         {
+            isCollidedCar = true;
             Vector3 dir = (car.transform.position - collision.contacts[0].point);
             CarCollisionJump(dir.normalized + (Vector3.up));
             //carDetectionCollider.enabled = true;

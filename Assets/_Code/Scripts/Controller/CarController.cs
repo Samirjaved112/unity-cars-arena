@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CarController : MonoBehaviour
@@ -37,7 +36,6 @@ public class CarController : MonoBehaviour
     private void Start()
     {
         touchDelta = 0;
-        Application.targetFrameRate = 60;
         StartCoroutine(SetInitialSpeed());
     }
 
@@ -51,7 +49,6 @@ public class CarController : MonoBehaviour
         }
 
         rb.useGravity = true;
-        Debug.Log("UPDATE");
     }
 
     void Update()

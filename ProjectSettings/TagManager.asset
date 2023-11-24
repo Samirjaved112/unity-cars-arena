@@ -9,6 +9,7 @@ TagManager:
   - CarTrig
   - WhiteHex
   - RedHex
+  - DeadZone
   layers:
   - Default
   - TransparentFX

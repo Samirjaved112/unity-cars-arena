@@ -12,12 +12,19 @@ public class DestroyFloor : MonoBehaviour
     [SerializeField] private Color whiteColor;
     [SerializeField] private Color redColor;
 
+    [SerializeField] private Vector3 upPos;
+    [SerializeField] private Vector3 downPos;
 
     private void Awake()
     {
         m_Material = GetComponent<MeshRenderer>().material;
     }
 
+    private void Start()
+    {
+        upPos = transform.position;
+        downPos = new Vector3(transform.position.x, transform.position.y - 3, transform.position.z);
+    }
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("CarTrig"))
@@ -29,8 +36,8 @@ public class DestroyFloor : MonoBehaviour
     private IEnumerator ChangePosition()
     {
 
-        Vector3 targetPosition = new Vector3(transform.position.x, transform.position.y - 3, transform.position.z);
-        Vector3 secondTarget = transform.position;
+        Vector3 targetPosition = downPos;
+        Vector3 secondTarget = upPos;
         yield return new WaitForSeconds(0.1f);
 
 
@@ -48,9 +55,14 @@ public class DestroyFloor : MonoBehaviour
         lerpDuration = lerpValue;
 
         // Moving Downward
-        yield return new WaitForSeconds(0.2f);
-        while (Vector3.Distance(transform.position, targetPosition) >= 0.1)
+        yield return new WaitForSeconds(1.5f);
+        while (Vector3.Distance(transform.position, targetPosition) > 0.1)
         {
+            if (Vector3.Distance(transform.position, targetPosition) < 1)
+            {
+                gameObject.layer = LayerMask.NameToLayer("Default");
+            }
+
             lerpDuration += Time.deltaTime;
             transform.position = Vector3.Lerp(transform.position, targetPosition, lerpDuration);
             yield return null;
@@ -59,6 +71,7 @@ public class DestroyFloor : MonoBehaviour
         lerpDuration = lerpValue;
 
         m_Material.color = Color.white;
+
 
         // Moving Upward
         yield return new WaitForSeconds(3f);
@@ -70,9 +83,10 @@ public class DestroyFloor : MonoBehaviour
         transform.position = secondTarget;
         lerpDuration = lerpValue;
 
+
         // Change Platform Tag to WhiteHex
         tag = "WhiteHex";
-
+        gameObject.layer = LayerMask.NameToLayer("Ground");
     }
 
     public void ChangeColor()
